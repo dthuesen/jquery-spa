@@ -50,8 +50,8 @@ $('#todo-list').on('click', '.edit-button', function(e) {
 
 $('#todo-list').on('submit', '.edit-item-form', function (e) {    // Arrow function does not work because of the this keyword
     e.preventDefault();
-    let formData = $(this).serialize();       // transforms the object into a string with all the data from the form
-    let actionUrl = $(this).attr('action')    // getting the id of the actual item, e.g. /todos/592d9e63e1f8601e87c83684
+    let formData = $(this).serialize();                           // transforms the object into a string with all the data from the form
+    let actionUrl = $(this).attr('action')                        // getting the id of the actual item, e.g. /todos/592d9e63e1f8601e87c83684
     let $originalItem = $(this).parent('.list-group-item');
     $.ajax({
       url: actionUrl,
