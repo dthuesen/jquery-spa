@@ -25,18 +25,45 @@ app.get("/", function(req, res){
   res.redirect("/todos");
 });
 
+/** ESCAPING ANY SPECIAL CHARACTER WITH A BACKSLASH */
+
+function escapeRegex(text) {
+  console.log('incoming text: ', text);
+  let escapedText = text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
+  console.log('escaped text: ', escapedText)
+  return escapedText;
+}
+
 app.get("/todos", function(req, res){
-  Todo.find({}, function(err, todos){
-    if(err){
-      console.log(err);
-    } else {
-      if (req.xhr) {
-        res.json(todos);
-      } else{
-        res.render("index", {todos: todos}); 
+  
+  if(req.query.keyword) { // if there's a query string called keyword then..
+    const regex = new RegExp(escapeRegex(req.query.keyword), 'gi') //set the const regex equal to new regex from the keyword pulled from from query string
+    console.log('escaped text: ', regex)
+    
+    Todo.find({text: regex}, function(err, todos){
+      if(err){
+        console.log(err);
+      } else {
+        res.json(todos); // send back the todos found as json
       } 
-    }
-  })
+    })
+  } else {
+    /** IF THERE WASN'T A QUERY STRING KEYWORD THEN... */
+    Todo.find({}, function(err, todos){ // query the db for all todos
+      if(err){
+        console.log(err);
+      } else {
+        if (req.xhr) { // if request was made with AJAX then...
+          res.json(todos); // send back all todos as JSON
+        } else{
+          res.render("index", {todos: todos}); // otherwise render the index view and pass in all todos with EJS
+        } 
+      }
+    })
+    
+  }
+  
+  
 });
 
 app.get("/todos/new", function(req, res){
