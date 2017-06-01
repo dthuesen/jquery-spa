@@ -7,8 +7,8 @@
 			<h1>New Item</h1>
 			<form action="/todos" method="POST" id="new-todo-form">
 				<div class="form-group">
-					<label>Item Text</label>
-					<input type="text" name="todo[text]" class="form-control" id="new-item-input">
+					<label for="new-item-input">Item Text</label>
+					<input type="text" name="todo[text]" class="form-control" id="new-item-input" placeholder="Enter new task...">
 				</div>
 				<button class="btn btn-primary">Create Item</button>
 			</form>
@@ -21,8 +21,8 @@
 					
 					<form action="/todos/<%=todo._id%>" method="POST" class="edit-item-form">
 						<div class="form-group">
-							<label>Item Text</label>
-							<input type="text" value="<%= todo.text %>" name="todo[text]" class="form-control">
+							<label for="<%=todo._id%>">Item Text</label>
+							<input type="text" value="<%= todo.text %>" name="todo[text]" class="form-control" id="<%=todo._id%>">
 						</div>
 						<button class="btn btn-primary">Update Item</button>
 					</form>
@@ -32,7 +32,7 @@
 					</span>
 					<div class="pull-right">
 						<button class="btn btn-sm btn-warning edit-button">Edit</button>
-						<form id="delete-item" style="display: inline" method="POST" action="/todos/<%=todo._id%>">
+						<form id="delete-item" style="display: inline" method="POST" action="/todos/<%=todo._id%>" class="delete-item-form">
 							<button type="submit" class="btn btn-sm btn-danger">Delete</button>
 						</form>
 					</div>

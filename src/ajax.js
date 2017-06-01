@@ -3,6 +3,10 @@
 //   console.log("data: ", data);
 // })
 
+
+
+/** ADDING A NEW ITEM */
+
 $('#new-todo-form').submit( function (e) {    // Arrow function does not work because of the this keyword
   e.preventDefault();
   let newTodoItem = $(this).serialize(); // transforms the object into a string with all the data from the form
@@ -12,12 +16,21 @@ $('#new-todo-form').submit( function (e) {    // Arrow function does not work be
     $('#todo-list').append(
       `
       <li class="list-group-item">
+        
+        <form action="/todos/${data._id}" method="POST" class="edit-item-form">
+          <div class="form-group">
+            <label for="${data._id}">Item Text</label>
+            <input type="text" value="${data.text}" name="todo[text]" class="form-control" id="${data._id}">
+          </div>
+          <button class="btn btn-primary">Update Item</button>
+        </form>
+        
         <span class="lead">
           ${data.text}
         </span>
         <div class="pull-right">
-          <a href="/todos/${data._id}/edit" class="btn btn-sm btn-warning">Edit</a>
-          <form style="display: inline" method="POST" action="/todos/${data._id}">
+          <button class="btn btn-sm btn-warning edit-button">Edit</button>
+          <form style="display: inline" method="POST" action="/todos/${data._id}" class="delete-item-form">
             <button type="submit" class="btn btn-sm btn-danger">Delete</button>
           </form>
         </div>
@@ -31,22 +44,18 @@ $('#new-todo-form').submit( function (e) {    // Arrow function does not work be
 
 
 
-$('form.delete-item').submit( function (e) {    // Arrow function does not work because of the this keyword
-  e.preventDefault();
-  let formAction = $(this).attr('action') // getting the id of the actual item, e.g. /todos/592d9e63e1f8601e87c83684
-  $.ajax({
-    url: formAction,
-    type: 'DELETE',
-    success: function(data) {
-      console.log("You have deleted data from the DB: ", data);
-    } 
-  });
-});
+
+/** TOGGLE EDIT FORM FOR ITEMS */
 
 $('#todo-list').on('click', '.edit-button', function(e) {
   e.preventDefault()
   $(this).parent().siblings('.edit-item-form').toggle();
 });
+
+
+
+
+/** EDITING AN ITEM */
 
 $('#todo-list').on('submit', '.edit-item-form', function (e) {    // Arrow function does not work because of the this keyword
     e.preventDefault();
@@ -64,8 +73,8 @@ $('#todo-list').on('submit', '.edit-item-form', function (e) {    // Arrow funct
           `
           <form action="/todos/${data._id}" method="POST" class="edit-item-form">
 						<div class="form-group">
-							<label>Item Text</label>
-							<input type="text" value="${data.text}" name="todo[text]" class="form-control">
+							<label for="${data._id}">Item Text</label>
+							<input type="text" value="${data.text}" name="todo[text]" class="form-control" id="${data._id}">
 						</div>
 						<button class="btn btn-primary">Update Item</button>
 					</form>
@@ -75,7 +84,7 @@ $('#todo-list').on('submit', '.edit-item-form', function (e) {    // Arrow funct
 					</span>
 					<div class="pull-right">
 						<button class="btn btn-sm btn-warning edit-button">Edit</button>
-						<form id="delete-item" style="display: inline" method="POST" action="/todos/${data._id}">
+						<form id="delete-item" style="display: inline" method="POST" action="/todos/${data._id}" class="delete-item-form">
 							<button type="submit" class="btn btn-sm btn-danger">Delete</button>
 						</form>
 					</div>
@@ -85,4 +94,33 @@ $('#todo-list').on('submit', '.edit-item-form', function (e) {    // Arrow funct
       } 
     });
   });
+
+
+
+/** DELETING AN ITEM */
+
+$('#todo-list').on('submit', '.delete-item-form', function (e) {    // Arrow function does not work because of the this keyword
+  e.preventDefault();
+  let confirmResponse = confirm("Are you sure?");
+  
+  if(confirmResponse) {
+    let actionURL = $(this).attr('action'); // getting the id of the actual item, e.g. /todos/592d9e63e1f8601e87c83684
+    let $itemToDelete = $(this).closest('.list-group-item');
+    
+    $.ajax({
+      url: actionURL,
+      type: 'DELETE',
+      itemToDelete: $itemToDelete,
+      success: function(data) {
+        console.log("You have deleted data from the DB: ", data);
+        console.log('this: ', this)
+        this.itemToDelete.remove();
+      } 
+    });
+  } else {
+    $(this).find('button').blur();
+  }
+});
+
+
 
